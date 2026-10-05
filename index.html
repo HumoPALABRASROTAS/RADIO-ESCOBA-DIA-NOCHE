@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RADIO ESCOBA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cover:230px; --pad:30px; --extra:110px;
+    --theme:#c41608;
+    --base:#e2e8f0; --dark:#a3b1c6; --light:#ffffff;
+    --text:#5b6577; --soft:#8a99af;
+    --sh-d:rgba(163,177,198,.6); --sh-l:rgba(255,255,255,.5);
+  }
+  :root[data-theme="dark"]{
+    --base:#262a33; --dark:#14161b; --light:#363c49;
+    --text:#cdd5e3; --soft:#8f9bb1;
+    --sh-d:rgba(0,0,0,.5); --sh-l:rgba(255,255,255,.06);
+  }
+  .card,#play,#vol{transition:background-color .3s ease, color .3s ease, box-shadow .3s ease}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; padding:16px 12px; min-height:100%;
+    display:flex;
+    font-family:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:transparent; color:var(--text);
+  }
+  .card{
+    position:relative; overflow:hidden; margin:auto;
+    width:calc(var(--cover) + 2*var(--pad) + var(--extra)); max-width:100%;
+    padding:var(--pad); border-radius:30px; background:var(--base);
+    box-shadow:9px 9px 16px var(--sh-d), -9px -9px 16px var(--sh-l);
+  }
+  .card > *{position:relative; z-index:1}
+  .watermark{
+    position:absolute !important; z-index:0 !important; bottom:45px; right:20px;
+    width:90px; height:90px; opacity:.45; pointer-events:none;
+    background:url("https://i.postimg.cc/t4wqh9S6/ESCOBA-SINFOFO.png") center/contain no-repeat;
+  }
+  h1{
+    margin:0 0 9px; text-align:center; font-size:14px; font-weight:700;
+    text-transform:uppercase; letter-spacing:1.5px;
+  }
+  .cover{
+    width:100%; height:var(--cover); border-radius:20px; overflow:hidden; margin-bottom:18px;
+    box-shadow:inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
+  }
+  .cover img{width:100%; height:100%; object-fit:contain; display:block}
+  .info{text-align:center; margin-bottom:6px}
+  .station{font-size:12px; color:var(--soft); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px}
+  .artist{font-size:18px; font-weight:700; line-height:1.2; margin-bottom:4px}
+  .song{font-size:14px; color:var(--soft); min-height:1.3em}
+  .mq{overflow:hidden; white-space:nowrap; padding:0 5px; text-align:center}
+  .mq .track{display:inline-block}
+  .mq .track span{display:inline-block}
+  .mq.run .track span{padding-right:48px}
+  .mq.run{text-align:left}
+  .mq.run .track{animation:mq var(--d,12s) linear infinite}
+  .mq.run:hover .track{animation-play-state:paused}
+  .mq.ell{text-overflow:ellipsis}
+  @keyframes mq{to{transform:translateX(-50%)}}
+  .controls{display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:18px}
+  #play{
+    width:70px; height:45px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--base); color:var(--text);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:5px 5px 10px var(--dark), -5px -5px 10px var(--light);
+    transition:all .2s ease-in-out;
+  }
+  #play:active{box-shadow:inset 5px 5px 10px var(--dark), inset -5px -5px 10px var(--light); transform:scale(.98)}
+  #play svg{width:28px; height:28px; fill:currentColor}
+  #play .pause{display:none}
+  #play.on .play{display:none}
+  #play.on .pause{display:block}
+  #play:focus-visible,#vol:focus-visible{outline:3px solid var(--theme); outline-offset:3px}
+  .vol{display:flex; align-items:center; width:100%}
+  .vol svg{width:24px; height:24px; fill:var(--soft); opacity:.7; margin-right:8px; flex-shrink:0}
+  #vol{
+    -webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:5px;
+    background:var(--base); outline:none; cursor:pointer;
+    box-shadow:inset 2px 2px 5px var(--dark), inset -2px -2px 5px var(--light);
+  }
+  #vol::-webkit-slider-thumb{
+    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--base); border:2px solid var(--theme);
+    box-shadow:3px 3px 6px var(--dark), -3px -3px 6px var(--light);
+  }
+  #vol::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%;
+    background:var(--base); border:2px solid var(--theme);
+    box-shadow:3px 3px 6px var(--dark), -3px -3px 6px var(--light);
+  }
+  #theme{
+    position:absolute; top:14px; right:14px; z-index:3;
+    width:34px; height:34px; border:0; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--base); color:var(--text);
+    box-shadow:4px 4px 8px var(--dark), -4px -4px 8px var(--light);
+    transition:all .2s ease-in-out;
+  }
+  #theme:active{box-shadow:inset 3px 3px 6px var(--dark), inset -3px -3px 6px var(--light); transform:scale(.97)}
+  #theme:focus-visible{outline:3px solid var(--theme); outline-offset:3px}
+  #theme svg{width:18px; height:18px; fill:currentColor}
+  #theme .sun{display:none}
+  :root[data-theme="dark"] #theme .sun{display:block}
+  :root[data-theme="dark"] #theme .moon{display:none}
+  .time{text-align:center; font-size:14px; margin-top:18px}
+  #clock{margin-left:10px}
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="watermark"></div>
+    <button id="theme" type="button" aria-label="Cambiar a modo oscuro" aria-pressed="false">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5h0a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 17a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM2 12a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1zm17 0a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2h-2a1 1 0 0 1-1-1zM5.6 5.6a1 1 0 0 1 1.4 0l1.4 1.4A1 1 0 0 1 7 8.4L5.6 7a1 1 0 0 1 0-1.4zm10 10a1 1 0 0 1 1.4 0l1.4 1.4a1 1 0 0 1-1.4 1.4L15.6 17a1 1 0 0 1 0-1.4zM18.4 5.6a1 1 0 0 1 0 1.4L17 8.4A1 1 0 0 1 15.6 7L17 5.6a1 1 0 0 1 1.4 0zM8.4 15.6a1 1 0 0 1 0 1.4L7 18.4A1 1 0 0 1 5.6 17L7 15.6a1 1 0 0 1 1.4 0z"/></svg>
+    </button>
+    <h1>RADIO ESCOBA</h1>
+
+    <div class="cover"><img src="https://i.postimg.cc/y69049Tj/logo.jpg" alt="Logo Radio Escoba"></div>
+
+    <div class="info" aria-live="polite">
+      <div class="station">Radio Escoba</div>
+      <div class="artist mq" id="artist">Radio Escoba</div>
+      <div class="song mq" id="song">En vivo</div>
+    </div>
+
+    <div class="controls">
+      <button id="play" type="button" aria-label="Reproducir / Pausar">
+        <svg class="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <div class="vol">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <input type="range" id="vol" min="0" max="100" value="50" aria-label="Volumen">
+      </div>
+    </div>
+
+    <div class="time"><span id="date"></span><span id="clock"></span></div>
+  </main>
+
+<script>
+  const BASE   = "https://app.sonicpanelradio.com/8126";
+  const STREAM = BASE + "/stream";
+  const REFRESH_MS = 10000;
+
+  const $ = id => document.getElementById(id);
+  const audio = new Audio();
+  audio.preload = "none";
+  audio.volume = 0.5;
+
+  // ---- Reproducción ----
+  const playBtn = $("play");
+  function setOn(on){ playBtn.classList.toggle("on", on); }
+  playBtn.addEventListener("click", () => {
+    if (playBtn.classList.contains("on")) {
+      audio.pause(); audio.removeAttribute("src"); audio.load(); setOn(false);
+    } else {
+      audio.src = STREAM + "?" + Date.now();   // siempre en directo
+      audio.play().then(() => setOn(true)).catch(() => setOn(false));
+    }
+  });
+  audio.addEventListener("error", () => { if (audio.src) { setOn(false); setMarquee($("song"), "Sin señal, pulsa play"); last = ""; } });
+
+  // ---- Modo claro / oscuro ----
+  const themeBtn = $("theme");
+  function applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    themeBtn.setAttribute("aria-pressed", t === "dark");
+    themeBtn.setAttribute("aria-label", t === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+  }
+  let saved = null;
+  try { saved = localStorage.getItem("escoba-theme"); } catch (e) {}
+  applyTheme(saved === "dark" ? "dark" : "light");
+  themeBtn.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("escoba-theme", next); } catch (e) {}
+  });
+
+  // ---- Volumen ----
+  $("vol").addEventListener("input", e => { audio.volume = e.target.value / 100; });
+
+  // ---- Texto con desplazamiento cuando no cabe ----
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function setMarquee(el, text) {
+    el._text = text;
+    el.classList.remove("run", "ell");
+    el.title = text;
+    el.innerHTML = "";
+    const track = document.createElement("div");
+    track.className = "track";
+    const a = document.createElement("span");
+    a.textContent = text;
+    track.appendChild(a);
+    el.appendChild(track);
+    const overflow = a.offsetWidth - (el.clientWidth - 10);
+    if (overflow > 0) {
+      if (reduce) { el.classList.add("ell"); return; }
+      const b = a.cloneNode(true);
+      b.setAttribute("aria-hidden", "true");
+      track.appendChild(b);
+      el.style.setProperty("--d", Math.max(8, a.offsetWidth / 40) + "s");   // ~40 px/s
+      el.classList.add("run");
+    }
+  }
+  window.addEventListener("resize", () => {
+    [$("artist"), $("song")].forEach(el => el._text && setMarquee(el, el._text));
+  });
+
+  // ---- Tema de la canción ----
+  let last = "";
+  const clean = s => { const d = document.createElement("div"); d.innerHTML = String(s || ""); return d.textContent.trim(); };
+
+  function show(full) {
+    full = clean(full);
+    if (!full || full === last) return;
+    last = full;
+    const i = full.indexOf(" - ");
+    setMarquee($("artist"), i > 0 ? full.slice(0, i) : full);
+    setMarquee($("song"),   i > 0 ? full.slice(i + 3) : "");
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: i > 0 ? full.slice(i + 3) : full,
+        artist: i > 0 ? full.slice(0, i) : "Radio Escoba",
+        artwork: [{ src: "https://i.postimg.cc/y69049Tj/logo.jpg" }]
+      });
+    }
+  }
+
+  function pick(d) {
+    if (!d || typeof d !== "object") return "";
+    let t = d.songtitle || d.title || d.song || d.currenttrack;
+    if (!t && d.icestats && d.icestats.source) {
+      const s = [].concat(d.icestats.source)[0];
+      t = s && (s.title || s.song);
+    }
+    return t || "";
+  }
+
+  // JSONP: evita el bloqueo CORS al consultar otro dominio
+  function jsonp(url, ms = 6000) {
+    return new Promise((resolve, reject) => {
+      const cb = "cb" + Date.now() + Math.floor(Math.random() * 1e6);
+      const s = document.createElement("script");
+      const end = (fn, v) => { clearTimeout(t); delete window[cb]; s.remove(); fn(v); };
+      const t = setTimeout(() => end(reject), ms);
+      window[cb] = d => end(resolve, d);
+      s.onerror = () => end(reject);
+      s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function update() {
+    for (const url of [BASE + "/stats?sid=1&json=1", BASE + "/status-json.xsl"]) {
+      try { const t = pick(await jsonp(url)); if (t) return show(t); } catch (e) {}
+    }
+    const HOST = BASE.replace(/\/8126$/, "");
+    const FALLBACKS = [
+      [HOST + "/cp/get_info.php?p=8126", r => r.json().then(pick)],
+      [BASE + "/currentsong?sid=1",      r => r.text()],
+      [BASE + "/7.html",                 r => r.text().then(h => h.replace(/<[^>]*>/g, "").split(",").slice(6).join(","))]
+    ];
+    for (const [url, parse] of FALLBACKS) {
+      try {
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) continue;
+        const t = clean(await parse(r));
+        if (t && t.length < 200) return show(t);
+      } catch (e) {}
+    }
+  }
+  setMarquee($("artist"), "Radio Escoba"); setMarquee($("song"), "En vivo");
+  update();
+  setInterval(() => { if (!document.hidden) update(); }, REFRESH_MS);
+
+  // ---- Fecha y hora ----
+  const DIAS = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  function tick() {
+    const n = new Date();
+    $("date").textContent = `${DIAS[n.getDay()]}, ${n.getDate()} ${MESES[n.getMonth()]} ${n.getFullYear()}`;
+    $("clock").textContent = String(n.getHours()).padStart(2,"0") + ":" + String(n.getMinutes()).padStart(2,"0");
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
